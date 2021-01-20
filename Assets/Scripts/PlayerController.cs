@@ -6,10 +6,12 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
     float playerSpeed = 5f;
-    float jumpForce = 0.5f;
+    float jumpForce = 5f;
 
     int healthPoint = 50;
     int coinCount = 0;
+
+    bool isOnGround = true;
 
     Animator playerAni;
     Rigidbody2D RB;
@@ -50,8 +52,9 @@ public class PlayerController : MonoBehaviour
             playerAni.SetFloat("xVelocity", 0);
         }
 
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && isOnGround == true)
         {
+            isOnGround = false;
             vVelocity = jumpForce;
             playerAni.SetTrigger("Jumped");
         }
@@ -63,16 +66,22 @@ public class PlayerController : MonoBehaviour
 
      private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isOnGround = true;
+        }
         if (collision.gameObject.CompareTag("Mace"))
         {
             healthPoint -= 10;
             healthText.GetComponent<Text>().text = "Health: " + healthPoint;
+            int rand = Random.Range(1,3);
+            audioSource.PlayOneShot(audioClip[rand]);
         }
 
         if (collision.gameObject.CompareTag("Coin"))
         {
-            Destroy(collision.gameObject);
             coinCount++;
+            Destroy(collision.gameObject);
             coinText.GetComponent<Text>().text = "Coin: " + coinCount;
             audioSource.PlayOneShot(audioClip[0]);
         }
