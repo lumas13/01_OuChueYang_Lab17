@@ -8,6 +8,7 @@ TagManager:
   - Mace
   - Coin
   - Ground
+  - Goal
   layers:
   - Default
   - TransparentFX

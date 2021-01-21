@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
     float playerSpeed = 5f;
-    float jumpForce = 5f;
+    float jumpForce = 7f;
 
     int healthPoint = 50;
     int coinCount = 0;
@@ -31,6 +32,11 @@ public class PlayerController : MonoBehaviour
 
     // Update is called once per frame
     void Update()
+    {
+        Movement();
+    }
+
+    public void Movement()
     {
         float hVelocity = 0;
         float vVelocity = 0;
@@ -62,8 +68,8 @@ public class PlayerController : MonoBehaviour
         hVelocity = Mathf.Clamp(RB.velocity.x + hVelocity, -5, 5); //To limit to given no
 
         RB.velocity = new Vector2(hVelocity, RB.velocity.y + vVelocity); //Jump things
-    }
 
+    }
      private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
@@ -76,6 +82,11 @@ public class PlayerController : MonoBehaviour
             healthText.GetComponent<Text>().text = "Health: " + healthPoint;
             int rand = Random.Range(1,3);
             audioSource.PlayOneShot(audioClip[rand]);
+
+            if (healthPoint <= 0)
+            {
+                SceneManager.LoadScene("LoseScene");
+            }
         }
 
         if (collision.gameObject.CompareTag("Coin"))
@@ -84,6 +95,11 @@ public class PlayerController : MonoBehaviour
             Destroy(collision.gameObject);
             coinText.GetComponent<Text>().text = "Coin: " + coinCount;
             audioSource.PlayOneShot(audioClip[0]);
+        }
+
+        if (collision.gameObject.CompareTag("Goal"))
+        {
+            SceneManager.LoadScene("WinScene");
         }
     }
 }
