@@ -7,12 +7,13 @@ using UnityEngine.SceneManagement;
 public class PlayerController : MonoBehaviour
 {
     float playerSpeed = 5f;
-    float jumpForce = 7f;
+    float jumpForce = 5.5f;
 
-    int healthPoint = 50;
+    int healthPoint = 10;
     int coinCount = 0;
 
     bool isOnGround = true;
+    bool isWalking = false;
 
     Animator playerAni;
     Rigidbody2D RB;
@@ -43,18 +44,21 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.LeftArrow))
         {
+            isWalking = true;
             hVelocity = -playerSpeed; //Negative 
             transform.localScale = new Vector3(-1, 1, 1);
             playerAni.SetFloat("xVelocity", Mathf.Abs(hVelocity));
         }
         else if (Input.GetKey(KeyCode.RightArrow))
         {
+            isWalking = true;
             hVelocity = playerSpeed; //Positive 
             transform.localScale = new Vector3(1, 1, 1); //localScale to turn left/right 
             playerAni.SetFloat("xVelocity", Mathf.Abs(hVelocity));
         }
         else
         {
+            isWalking = false;
             playerAni.SetFloat("xVelocity", 0);
         }
 
@@ -65,9 +69,19 @@ public class PlayerController : MonoBehaviour
             playerAni.SetTrigger("Jumped");
         }
 
-        hVelocity = Mathf.Clamp(RB.velocity.x + hVelocity, -5, 5); //To limit to given no
+        hVelocity = Mathf.Clamp(RB.velocity.x + hVelocity, -3, 3); //To limit to given no
 
         RB.velocity = new Vector2(hVelocity, RB.velocity.y + vVelocity); //Jump things
+
+        
+        if (isWalking == true)
+        {
+            audioSource.clip = audioClip[3];
+            if (!audioSource.isPlaying)
+            {
+                audioSource.Play();
+            }
+        }
 
     }
      private void OnCollisionEnter2D(Collision2D collision)
@@ -79,7 +93,7 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Mace"))
         {
             healthPoint -= 10;
-            healthText.GetComponent<Text>().text = "Health: " + healthPoint;
+            healthText.GetComponent<Text>().text = "Health: 10" + healthPoint;
             int rand = Random.Range(1,3);
             audioSource.PlayOneShot(audioClip[rand]);
 
